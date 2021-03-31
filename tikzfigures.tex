@@ -1,0 +1,422 @@
+\documentclass{article}
+\usepackage[hmargin=2cm,vmargin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,shapes.multipart,arrows,fit,decorations,decorations.pathreplacing,decorations.pathmorphing}
+\usepackage{mhchem}
+\usepackage{anyfontsize}
+
+\begin{document}
+	
+	% Define decoration
+	\pgfdeclaredecoration{lipidleaflet}{initial}
+	{
+		% Place as many segments as possible along the path to decorate
+		% the minimum distance between two segments is set to 7 pt.
+		\state{initial}[width=\pgfdecoratedpathlength/floor(\pgfdecoratedpathlength/6pt)]
+		{
+			% Draw the two acyl chains
+			\pgfpathmoveto{\pgfpoint{-1pt}{0pt}}
+			\pgfpathlineto{\pgfpoint{-1pt}{-10pt}}
+			\pgfpathmoveto{\pgfpoint{1pt}{0pt}}
+			\pgfpathlineto{\pgfpoint{1pt}{-10pt}}
+			% Draw the head group
+			\pgfpathmoveto{\pgfpoint{1pt}{0pt}}
+			\pgfpathcircle{\pgfpoint{0pt}{2pt}}{2.5pt}
+		}
+		\state{final}
+		{
+			\pgfpathmoveto{\pgfpointdecoratedpathlast}
+		}
+	}
+	\pgfdeclaredecoration{parallel snake}{initial}
+	{
+		% Place as many segments as possible along the path to decorate
+		% the minimum distance between two segments is set to 7 pt.
+		\state{initial}[width=\pgfdecorationsegmentlength,switch if less than=\pgfdecorationsegmentlength to final]
+		{
+			% Draw the two acyl chains
+			\pgfpathlineto{\pgfpoint{0pt}{\pgfdecorationsegmentamplitude }}
+			\pgfpatharc{180}{0}{\pgfdecorationsegmentlength / 4}
+			\pgfpathlineto{\pgfpoint{\pgfdecorationsegmentlength / 2}{- \pgfdecorationsegmentamplitude }}
+			\pgfpatharc{-180}{0}{\pgfdecorationsegmentlength / 4}
+			\pgfpathlineto{\pgfpoint{\pgfdecorationsegmentlength}{0pt}}
+		}
+		\state{final}
+		{
+			\pgfpathlineto{\pgfpoint{0pt}{\pgfdecorationsegmentamplitude }}
+			\pgfpatharc{180}{0}{\pgfdecorationsegmentlength / 4}
+			\pgfpathlineto{\pgfpoint{\pgfdecorationsegmentlength / 2}{0pt}}
+			\pgfpathmoveto{\pgfpointdecoratedpathlast}
+		}
+	}
+	\begin{figure}
+		\centering
+		\begin{subfigure}[t]{0.4\textwidth}
+		\centering
+	\scalebox{1}{
+	\begin{tikzpicture}
+	[node distance=24.25pt,thick,text centered,
+	epithelial/.style={text=WildStrawberry,font=\scriptsize},
+	menthol/.style={text=OliveGreen,font=\scriptsize,inner sep=0pt},
+	dtbp/.style={text=BrickRed,font=\scriptsize,inner sep=0pt},
+	atom/.style={rectangle,inner sep=0pt},
+	alphahelix/.style={rectangle,rounded corners, draw=Orchid,fill=Orchid!80,
+		draw opacity=0.99,fill opacity=0.95,
+		minimum height=20mm,minimum width=18pt},
+	calcium/.style={circle,fill=LimeGreen!80,draw=LimeGreen,inner sep=0pt,font=\fontsize{3}{0},
+		node distance=14.25pt},
+	dep/.style={draw=Black,fill=Black!60, minimum width=2mm,shape=star, star points=10, star point
+		ratio=1.2},
+	depsmall/.style={draw=Black, fill=Black!60, minimum width=0pt, inner sep=1pt ,shape=star, star
+		points=10, star point ratio=1.2, node distance=5.25pt},
+	interTMsmall/.style={decorate, decoration={parallel snake,segment length=25pt,amplitude = 4pt},
+		draw=black, line width=0.5mm},
+	interTMmedium/.style={decorate, decoration={parallel snake,segment length=18pt,amplitude = 20pt},
+		draw=black, line width=0.5mm},
+	interTMlarge/.style={decorate, decoration={parallel snake,mirror,segment length=18pt,amplitude = 20pt},
+		draw=black, line width=0.5mm}]
+	
+	
+	% Lipid bilayer
+	\draw[decorate, decoration={lipidleaflet,mirror}]
+	(-3.5, -2.8) -- (4, -2.8);
+	\draw[decorate, decoration={lipidleaflet}]
+	(-3.5, -2) -- (4, -2);
+	%\draw (0, -4) node {Lipid bilayer};
+	\node (ah1)[alphahelix]at (-2.015,-2.4){};
+	\node (ah2)[alphahelix,right of=ah1]{};
+	\node (ah3)[alphahelix,right of=ah2]{};
+	\node (ah4)[alphahelix,right of=ah3]{};
+	\node (ah5)[alphahelix,right of=ah4]{};
+	\node (ah6)[alphahelix,right of=ah5,xshift=12pt]{};
+	
+	\node (N)[atom,below of=ah1,yshift=-67.6pt,xshift=24.85pt]{\textbf{N}};
+	\node (C)[atom,below of=ah6,yshift=-31.6pt,xshift=-24.55pt]{\textbf{C}};
+	
+	\node(dep1) [dep,label={[font=\scriptsize,text=Black!60]135:DEP},above of=ah3,xshift=2mm,yshift=18mm] {};
+	\node(dep2) [dep,above of=ah4,xshift=5mm,yshift=4mm] {};
+	\node(deptext) [text=Black, below of=dep1,font=\scriptsize]
+	{\begin{tabular}{c}Charge and \\Mechanical \\activation\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=Black] ([xshift=-3mm]deptext.east) -- (dep2)
+	node[midway,right]{\scriptsize \textbf{?}};
+	
+	\node(deporg1) [depsmall,above of=ah2,yshift=12mm] {};
+	\node(deporg2) [depsmall,above of=deporg1,xshift=2mm] {};
+	\node(deporg3) [depsmall,above of=deporg1,yshift=2mm] {};
+	\node(deporgtext) [text=Black!60,left of=deporg3,xshift=-5mm,font=\scriptsize] {\begin{tabular}{c}DEP organic
+		\\extract\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=Black!60] ([xshift=-6mm]deporgtext.east) -- (deporg3);
+	
+	\draw [line width=0.5mm] (ah1.north) to[out=90,in=90] (ah2.north);
+	\draw [line width=0.5mm] (ah2.south) to[out=-90,in=-90] (ah3.south);
+	\draw [line width=0.5mm] (ah3.north) to[out=90,in=90] (ah4.north);
+	\draw [line width=0.5mm] (ah4.south) to[out=-90,in=-90] (ah5.south);
+	\draw [interTMsmall] (ah5.north) -- (ah6.north);
+	\draw [interTMlarge] (ah1.south) -- ([xshift=-20pt]N.west);
+	\draw [line width=0.5mm] ([xshift=-20pt]N.west) -- (N.west);
+	\draw [interTMmedium] (ah6.south) -- ([xshift=20pt]C.east);
+	\draw [line width=0.5mm] ([xshift=20pt]C.east) -- (C.east);
+	
+	\node (Ca1) [calcium,above of=ah6,yshift=15mm]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca2) [calcium,below of=ah5,xshift=-5mm,yshift=-15mm]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca3) [calcium,below of=Ca2]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca4) [calcium,right of=Ca3]{\textbf{\ce{Ca^{2+}}}};
+	\draw[->] [line width=0.5mm, draw=LimeGreen] (Ca1.south) to [bend right=22] (2,-2.4)
+	to [bend left=28] (Ca2);
+	
+	\node (bindingsite) [draw=Cerulean,fill=Cerulean,circle,below of=ah1, xshift=-2mm ,yshift=-4.8mm] {};
+	\node(deporg4) [depsmall,node distance=24.25pt,,below of=ah1, xshift=-2mm ,yshift=-4.8mm] {};
+	\draw[->] [line width=0.5mm, draw=BurntOrange] (deporg1.west) to [bend right=45] (-3,-2.4)
+	to [bend right=35] (deporg4);
+	\node (acroleintext) [text=BurntOrange,font=\scriptsize,left of=ah1,xshift=-5mm,yshift=9mm]
+	{\begin{tabular}{c}Acrolein, \\1,2-NQ\end{tabular}};
+	\node (acroleintext) [epithelial,text=Cerulean,left of=bindingsite,xshift=-8mm,yshift=-2mm]
+	{\begin{tabular}{c}Electrophilic \\binding site \\(3CK)\end{tabular}};
+	\draw[->] [line width=0.5mm, draw=Cerulean] ([xshift=- 3mm]acroleintext.east) -- (bindingsite);
+	
+	\node(mentholtext) [menthol,above of=ah5,yshift=17mm] {\begin{tabular}{c}Menthol/Propofol
+		\\binding site (ST)\end{tabular}};
+	\node(mentholdep) [depsmall,draw=OliveGreen, fill=OliveGreen!60,above of=ah5,xshift=-1mm,yshift=5mm]{};
+	\draw [->] [line width=0.5mm, draw=OliveGreen] (mentholtext.south) -- (mentholdep);
+	
+	\node(deporg4) [depsmall,draw=BrickRed,fill=BrickRed!60,above of=ah5,xshift=1mm,yshift=5mm] {};
+	\node(dtbptext) [dtbp,above of=ah6, yshift=7mm]{di-tert-butyphenol};
+	\draw [->] [line width=0.5mm, draw=BrickRed] ([xshift=-4mm]dtbptext.south) -- (deporg4);
+	\end{tikzpicture}
+}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[t]{.4\textwidth}  
+	\centering 
+	\scalebox{1}{
+		\begin{tikzpicture}
+		[node distance=24.25pt,thick, text centered,
+		padding/.style={rectangle,inner sep=0pt,draw=White!0,fill=White!0,
+			draw opacity=0,fill opacity=0},
+		atom/.style={rectangle,inner sep=0pt},
+		alphahelix/.style={rectangle,rounded corners, draw=SkyBlue,fill=SkyBlue!80,
+			draw opacity=0.99,fill opacity=0.95,
+			minimum height=20mm,minimum width=18pt},
+		calcium/.style={circle,fill=LimeGreen!80,draw=LimeGreen,inner sep=0pt,font=\fontsize{3}{0},
+			node distance=14.25pt},
+		pm/.style={draw=Periwinkle,fill=Black!60, minimum width=2mm,shape=star, star points=20, star point
+			ratio=1.4},
+		menthol/.style={circle,fill=OliveGreen,draw=OliveGreen,inner sep=0pt,minimum width=3pt,
+			node distance=10pt},
+		icilin/.style={circle,fill=Bittersweet,draw=Bittersweet,inner sep=0pt,minimum width=3pt,
+			node distance=10pt},
+		interTMsmall/.style={decorate, decoration={parallel snake,segment length=25pt,amplitude = 4pt},
+			draw=black, line width=0.5mm},
+		interTMmedium/.style={decorate, decoration={parallel snake,segment length=18pt,amplitude = 20pt},
+			draw=black, line width=0.5mm},
+		interTMlarge/.style={decorate, decoration={parallel snake,mirror,segment length=18pt,amplitude = 20pt},
+			draw=black, line width=0.5mm}]
+		
+		
+		% Lipid bilayer
+		\draw[decorate, decoration={lipidleaflet,mirror}]
+		(-3.5, -2.8) -- (4, -2.8);
+		\draw[decorate, decoration={lipidleaflet}]
+		(-3.5, -2) -- (4, -2);
+		%\draw (0, -4) node {Lipid bilayer};
+		\node (ah1)[alphahelix]at (-2.015,-2.4){};
+		\node (ah2)[alphahelix,right of=ah1]{};
+		\node (ah3)[alphahelix,right of=ah2]{};
+		\node (ah4)[alphahelix,right of=ah3]{};
+		\node (ah5)[alphahelix,right of=ah4]{};
+		\node (ah6)[alphahelix,right of=ah5,xshift=12pt]{};
+		
+		\node (N)[atom,below of=ah1,yshift=-49.55pt,xshift=24.85pt]{\textbf{N}};
+		\node (C)[atom,below of=ah6,yshift=-31.6pt,xshift=-24.55pt]{\textbf{C}};
+		
+		\draw [line width=0.5mm] (ah1.north) to[out=90,in=90] (ah2.north);
+		\draw [line width=0.5mm] (ah2.south) to[out=-90,in=-90] (ah3.south);
+		\draw [line width=0.5mm] (ah3.north) to[out=90,in=90] (ah4.north);
+		\draw [line width=0.5mm] (ah4.south) to[out=-90,in=-90] (ah5.south);
+		\draw [interTMsmall] (ah5.north) -- (ah6.north);
+		\draw [interTMlarge] (ah1.south) -- ([xshift=-20pt]N.west);
+		\draw [line width=0.5mm] ([xshift=-20pt]N.west) -- (N.west);
+		\draw [interTMmedium] (ah6.south) -- ([xshift=20pt]C.east);
+		\draw [line width=0.5mm] ([xshift=20pt]C.east) -- (C.east);
+		
+		\node(pm1) [pm,label={[font=\scriptsize,text=Periwinkle]135:PM},
+		above of=ah2,xshift=4mm,yshift=8mm] {};
+		\node(pm2) [pm,above of=ah5,xshift=4mm,yshift=4mm] {};
+		\node(pmtext) [text=Black, left of=pm2,xshift=-2mm,yshift=7mm,font=\scriptsize]
+		{\begin{tabular}{c}Mechanical \\activation\end{tabular}};
+		\draw [->] [line width=0.5mm, draw=Black] ([xshift=-3mm]pmtext.east) -- (pm2)
+		node[midway,right]{\scriptsize \textbf{?}};
+		
+		\node (Ca1) [calcium,above of=ah6,yshift=15mm]{\textbf{\ce{Ca^{2+}}}};
+		\node (Ca2) [calcium,below of=ah5,xshift=-5mm,yshift=-15mm]{\textbf{\ce{Ca^{2+}}}};
+		\node (Ca3) [calcium,below of=Ca2]{\textbf{\ce{Ca^{2+}}}};
+		\node (Ca4) [calcium,right of=Ca3]{\textbf{\ce{Ca^{2+}}}};
+		\draw[->] [line width=0.5mm, draw=LimeGreen] (Ca1.south) to [bend right=22] (2,-2.4)
+		to [bend left=28] (Ca2);
+		
+		\node (icilin1) [icilin] at (-3.5,-0.25){};
+		\node(icilintext) [text=Bittersweet,right of=icilin1,xshift=2mm,font=\scriptsize]
+		{\begin{tabular}{l}Icilin binding \\site\end{tabular}};
+		\node (menthol1) [menthol,below of=icilin1,yshift=-2mm]{};
+		\node(mentholtext) [text=OliveGreen,right of=menthol1,xshift=1mm,font=\scriptsize]
+		{\begin{tabular}{l}Menthol \\binding site\end{tabular}};
+		
+		\node (icilin2) [icilin,above of=ah3]{};
+		\node (icilin3) [icilin,left of=ah3,xshift=2mm]{};
+		\node (icilin4) [icilin,below of=ah3]{};	
+		\node (menthol2) [menthol,above of=ah2,yshift=0mm]{};
+		\node (menthol3) [menthol,below of=ah4,yshift=0mm]{};
+		
+		\node (menthol4) [menthol,below of=ah6, xshift=-2mm ,yshift=-9.75mm] {};
+		\node (menthol5) [menthol,below of=ah6, xshift=1mm ,yshift=-9.75mm] {};
+		
+		\node(padding) [padding,below of=N,yshift=1mm]{};
+		
+		\end{tikzpicture}
+	}
+\end{subfigure}
+		\vskip\baselineskip
+		\begin{subfigure}[t]{0.475\textwidth}
+			\centering
+\scalebox{1}{
+	\begin{tikzpicture}
+	[node distance=24.25pt,thick,text centered,
+	atom/.style={rectangle,inner sep=0pt},
+	alphahelix/.style={rectangle,rounded corners, draw=Tan,fill=Tan!80,
+		draw opacity=0.99,fill opacity=0.95,
+		minimum height=20mm,minimum width=18pt},
+	calcium/.style={circle,fill=LimeGreen!80,draw=LimeGreen,inner sep=0pt,font=\fontsize{3}{0},
+		node distance=14.25pt},
+	cfa/.style={draw=Sepia,fill=Sepia!60, minimum width=2mm,shape=star, star points=16, star point
+		ratio=1.4},
+	interTMsmall/.style={decorate, decoration={parallel snake,segment length=25pt,amplitude = 4pt},
+		draw=black, line width=0.5mm},
+	interTMmedium/.style={decorate, decoration={parallel snake,segment length=18pt,amplitude = 20pt},
+		draw=black, line width=0.5mm},
+	interTMlarge/.style={decorate, decoration={parallel snake,mirror,segment length=18pt,amplitude = 20pt},
+		draw=black, line width=0.5mm},
+	sensory/.style={text=NavyBlue,font=\scriptsize},
+	epithelial/.style={text=WildStrawberry,font=\scriptsize}]
+	
+	
+	% Lipid bilayer
+	\draw[decorate, decoration={lipidleaflet,mirror}]
+	(-3.5, -2.8) -- (4, -2.8);
+	\draw[decorate, decoration={lipidleaflet}]
+	(-3.5, -2) -- (4, -2);
+	%\draw (0, -4) node {Lipid bilayer};
+	\node (ah1)[alphahelix]at (-2.015,-2.4){};
+	\node (ah2)[alphahelix,right of=ah1]{};
+	\node (ah3)[alphahelix,right of=ah2]{};
+	\node (ah4)[alphahelix,right of=ah3]{};
+	\node (ah5)[alphahelix,right of=ah4]{};
+	\node (ah6)[alphahelix,right of=ah5,xshift=12pt]{};
+	
+	\node (N)[atom,below of=ah1,yshift=-49.55pt,xshift=24.85pt]{\textbf{N}};
+	\node (C)[atom,below of=ah6,yshift=-31.6pt,xshift=-24.55pt]{\textbf{C}};
+	
+	\draw [line width=0.5mm] (ah1.north) to[out=90,in=90] (ah2.north);
+	\draw [line width=0.5mm] (ah2.south) to[out=-90,in=-90] (ah3.south);
+	\draw [line width=0.5mm] (ah3.north) to[out=90,in=90] (ah4.north);
+	\draw [line width=0.5mm] (ah4.south) to[out=-90,in=-90] (ah5.south);
+	\draw [interTMsmall] (ah5.north) -- (ah6.north);
+	\draw [interTMlarge] (ah1.south) -- ([xshift=-20pt]N.west);
+	\draw [line width=0.5mm] ([xshift=-20pt]N.west) -- (N.west);
+	\draw [interTMmedium] (ah6.south) -- ([xshift=20pt]C.east);
+	\draw [line width=0.5mm] ([xshift=20pt]C.east) -- (C.east);
+	
+	\node(cfa1) [cfa,label={[font=\scriptsize,text=Sepia]135:CFA},
+	above of=ah1,xshift=2mm,yshift=10mm] {};
+	\node(cfa2) [cfa,above of=ah5,xshift=4mm,yshift=4mm] {};
+	\node(cfatext) [text=Black, left of=cfa2,xshift=-2mm,yshift=7mm,font=\scriptsize]
+	{\begin{tabular}{c}Charge and \\Mechanical \\activation\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=Black] ([xshift=-3mm]cfatext.east) -- (cfa2)
+	node[midway,right]{\scriptsize \textbf{?}};
+	
+	\node (Ca1) [calcium,above of=ah6,yshift=15mm]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca2) [calcium,below of=ah5,xshift=-5mm,yshift=-15mm]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca3) [calcium,below of=Ca2]{\textbf{\ce{Ca^{2+}}}};
+	\node (Ca4) [calcium,right of=Ca3]{\textbf{\ce{Ca^{2+}}}};
+	\draw[->] [line width=0.5mm, draw=LimeGreen] (Ca1.south) to [bend right=22] (2,-2.4)
+	to [bend left=28] (Ca2);
+	
+	\node (bindingsite) [draw=Cerulean,fill=Cerulean,circle,below of=ah2, xshift=4mm ,yshift=-4mm] {};
+	\node (acroleintext) [font=\scriptsize,text=Cerulean,below of=bindingsite,xshift=6mm,yshift=-4mm]
+	{\begin{tabular}{c}Y511A - \\Capsaicin \\binding site\end{tabular}};
+	\draw[->] [line width=0.5mm, draw=Cerulean] (acroleintext.north) -- (bindingsite);
+	
+	\node (sensory1)[sensory, below of=C, yshift=-10mm]{\textbf{Sensory Nerve}};
+	\node (sensory2)[sensory, below of =sensory1,yshift=-2mm] {\begin{tabular}{c}Substance P, CGRP
+		\\Neurokin A Release\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=NavyBlue] (sensory1) -- (sensory2);
+	\node (sensory3)[sensory,below of =sensory2,yshift=-3mm] {\begin{tabular}{c}NKA receptor,
+		\\others\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=NavyBlue] (sensory2) -- (sensory3);
+	\node (sensory4)[sensory,below of =sensory3,yshift=-3mm] {\begin{tabular}{c}Plasma Extravasation
+		\\Edema\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=NavyBlue] (sensory3) -- (sensory4);
+	
+	\node (epithelial1)[epithelial,left of=sensory1,xshift=-18mm]{\textbf{Epithelial cell}};
+	\node (epithelial2)[epithelial, below of =epithelial1,yshift=-2mm]{\begin{tabular}{c}Cytokine
+		\texttt{+}	\\Chemokine release\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=WildStrawberry] (epithelial1) -- (epithelial2);
+	\node (epithelial3)[epithelial, below of =epithelial2,yshift=-3mm]{\begin{tabular}{c}Non-neurogenic	\\Inflammation\end{tabular}};
+	\draw [->] [line width=0.5mm, draw=WildStrawberry] (epithelial2) -- (epithelial3);
+	
+	\end{tikzpicture}
+}
+		\end{subfigure}
+		\hfill
+	\begin{subfigure}[t]{.4\textwidth}  
+		\centering 
+		\scalebox{1}{
+			\begin{tikzpicture}
+			[node distance=24.25pt,thick, text centered,
+			padding/.style={rectangle,inner sep=0pt,draw=White!0,fill=White!0,
+				draw opacity=0,fill opacity=0},
+			atom/.style={rectangle,inner sep=0pt},
+			alphahelix/.style={rectangle,rounded corners, draw=Dandelion,fill=Dandelion!80,
+				draw opacity=0.99,fill opacity=0.95,
+				minimum height=20mm,minimum width=18pt},
+			calcium/.style={circle,fill=LimeGreen!80,draw=LimeGreen,inner sep=0pt,font=\fontsize{3}{0},
+				node distance=14.25pt},
+			pm/.style={draw=Periwinkle,fill=Black!60, minimum width=2mm,shape=star, star points=20, star point
+				ratio=1.4},
+			gating/.style={draw=Aquamarine,fill=Aquamarine!60, minimum width=3mm, inner sep=0pt, shape=star, star points=5, star point
+				ratio=2},
+			heat/.style={circle,fill=Red,draw=Red,inner sep=0pt,minimum width=3pt,
+				node distance=10pt},
+			interTMsmall/.style={decorate, decoration={parallel snake,segment length=25pt,amplitude = 4pt},
+				draw=black, line width=0.5mm},
+			interTMmedium/.style={decorate, decoration={parallel snake,segment length=18pt,amplitude = 20pt},
+				draw=black, line width=0.5mm},
+			interTMlarge/.style={decorate, decoration={parallel snake,mirror,segment length=18pt,amplitude = 20pt},
+				draw=black, line width=0.5mm}]
+			
+			
+			% Lipid bilayer
+			\draw[decorate, decoration={lipidleaflet,mirror}]
+			(-3.5, -2.8) -- (4, -2.8);
+			\draw[decorate, decoration={lipidleaflet}]
+			(-3.5, -2) -- (4, -2);
+			%\draw (0, -4) node {Lipid bilayer};
+			\node (ah1)[alphahelix]at (-2.015,-2.4){};
+			\node (ah2)[alphahelix,right of=ah1]{};
+			\node (ah3)[alphahelix,right of=ah2]{};
+			\node (ah4)[alphahelix,right of=ah3]{};
+			\node (ah5)[alphahelix,right of=ah4]{};
+			\node (ah6)[alphahelix,right of=ah5,xshift=12pt]{};
+			
+			\node (N)[atom,below of=ah1,yshift=-121.6pt,xshift=24.85pt]{\textbf{N}};
+			\node (C)[atom,below of=ah6,yshift=-31.6pt,xshift=-24.55pt]{\textbf{C}};
+			
+			\draw [line width=0.5mm] (ah1.north) to[out=90,in=90] (ah2.north);
+			\draw [line width=0.5mm] (ah2.south) to[out=-90,in=-90] (ah3.south);
+			\draw [line width=0.5mm] (ah3.north) to[out=90,in=90] (ah4.north);
+			\draw [line width=0.5mm] (ah4.south) to[out=-90,in=-90] (ah5.south);
+			\draw [interTMsmall] (ah5.north) -- (ah6.north);
+			\draw [interTMlarge] (ah1.south) -- ([xshift=-20pt]N.west);
+			\draw [line width=0.5mm] ([xshift=-20pt]N.west) -- (N.west);
+			\draw [interTMmedium] (ah6.south) -- ([xshift=20pt]C.east);
+			\draw [line width=0.5mm] ([xshift=20pt]C.east) -- (C.east);
+			
+			\node(pm1) [pm,label={[font=\scriptsize,text=Periwinkle]135:PM},
+			above of=ah2,xshift=4mm,yshift=8mm] {};
+			\node(pm2) [pm,above of=ah5,xshift=4mm,yshift=4mm] {};
+			\node(pmtext) [text=Black, left of=pm2,xshift=-2mm,yshift=7mm,font=\scriptsize]
+			{\begin{tabular}{c}Mechanical \\activation\end{tabular}};
+			\draw [->] [line width=0.5mm, draw=Black] ([xshift=-3mm]pmtext.east) -- (pm2)
+			node[midway,right]{\scriptsize \textbf{?}};
+			
+			\node (Ca1) [calcium,above of=ah6,yshift=15mm]{\textbf{\ce{Ca^{2+}}}};
+			\node (Ca2) [calcium,below of=ah5,xshift=-5mm,yshift=-15mm]{\textbf{\ce{Ca^{2+}}}};
+			\node (Ca3) [calcium,below of=Ca2]{\textbf{\ce{Ca^{2+}}}};
+			\node (Ca4) [calcium,right of=Ca3]{\textbf{\ce{Ca^{2+}}}};
+			\draw[->] [line width=0.5mm, draw=LimeGreen] (Ca1.south) to [bend right=22] (2,-2.4)
+			to [bend left=28] (Ca2);
+			
+			\node (heat1) [heat,below of=ah4,yshift=-3mm]{};
+			\node (heat2) [heat,above of=heat1,yshift=-1mm]{};
+			\node (heattext) [font=\scriptsize,text=Red,below of=heat1,xshift=-6mm,yshift=-4mm]
+			{Heat};
+			\draw[->] [line width=0.5mm, draw=Red] (heattext.north) -- (heat1);
+			
+			\node (gating1) [gating] at (-3.5,-0.25){};{};
+			\node (gatingtext) [font=\scriptsize,text=Aquamarine,right of=gating1,xshift=-1.5mm]
+			{Gating};
+			\node (gating2) [gating,below of=ah5,yshift=0mm]{};
+			
+			
+			\node(padding) [padding,below of=N,yshift=-15.5mm]{};
+			
+			
+			
+			\end{tikzpicture}
+		}
+	\end{subfigure}
+\end{figure}
+
+\end{document} 
