@@ -1,0 +1,137 @@
+\documentclass{article}
+\usepackage[hmargin=2cm,vmargin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{caption}  
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,shapes.multipart,arrows,fit}
+
+
+
+\begin{document}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+[node distance=2cm,thick,text centered,
+user/.style={rectangle,rounded corners,rectangle split, rectangle split parts=2, draw=red},
+partner/.style={rectangle, rounded corners, rectangle split, rectangle split parts=2,draw=blue},
+ddg/.style={rectangle, rounded corners, rectangle split, rectangle split parts=2,draw=black},
+query/.style={rectangle, draw=black,fill=white},
+result/.style={draw=blue,fill=white},
+arrow1/.style={->,>=stealth,draw=black},
+arrow2/.style={->,>=stealth,draw=blue}]
+
+\node (user) [user] {User\nodepart{second}\begin{tabular}{c}Doing a \\search\end{tabular}};
+\node (ddg) [ddg, right of=user,xshift=2cm] {\includegraphics[width=20mm]{images/duckduckgo_logo.pdf}\nodepart{second}
+\begin{tabular}{c} Isolating \\ user from \\ partners. \end{tabular}};
+\node (ia) [partner,right of=ddg,xshift=3cm,yshift=2cm] {\begin{tabular}{c} \textit{Instant Answer} \\ provider \end{tabular}\nodepart{second}
+eg. \textit{Wikipedia}};
+\node (link) [partner,below of=ia] {\begin{tabular}{c} Search result \\ provider \end{tabular}\nodepart{second}
+eg. \textit{Bing}, \textit{Yandex}};
+\node (ad) [partner,below of=link] 
+    {\includegraphics[width=20mm]{images/MicrosoftAds.png} \nodepart{second} 
+    Only ad provider};
+%draw query and its arrow in red as it's not yet private
+\draw [arrow1,draw=red,transform canvas={yshift=10pt}] (user) -- node[query,draw=red] {Query} (ddg);
+\draw [arrow2,transform canvas={yshift=-10pt}] (ddg) -- node[result] {Result} (user);
+\draw [arrow1] (ddg.east) -|(160pt,53pt) -- node[query] {Query} (ia);
+\draw [arrow2] ([yshift=15pt]ia.west) -| node[result] {Result} (ddg.north);
+\draw [arrow1] (ddg.east) --(160pt,0 pt)-- node[query] {Query} (link);
+\draw [arrow2] ([yshift=20pt]link.west) --(215pt,20 pt)-- node[result] {Result} ([yshift=20pt]ddg.east);
+\draw [arrow1] (ddg.east) -|(160pt,-53pt)-- node[query] {Query} (ad);
+\draw [arrow2] ([yshift=-15pt]ad.west) -| node[result] {Result} (ddg.south);
+\end{tikzpicture}
+\caption{Anonymization process of \textit{DuckDuckGo}}
+\label{anonymization}
+\end{figure}
+
+\begin{figure}[]
+    \centering
+    \begin{tikzpicture}
+    [
+    node distance=1cm,thick,text centered,
+    user/.style={rectangle,rounded corners,text centered, draw=black,minimum height=10mm,minimum width=15mm},
+    partner/.style={thick,rectangle,rounded corners,text centered, draw=black,minimum height=20mm,minimum width=20mm},
+    result/.style={draw=blue,fill=white},
+    arrow1/.style={->,>=stealth,draw=black},
+    arrow2/.style={->,>=stealth,draw=Goldenrod},
+    item/.style={rectangle,text centered,fill=white,inner sep=0},
+    order/.style={item,draw=Goldenrod,fill=Goldenrod!50},
+    adclick/.style={item,draw=LimeGreen,fill=LimeGreen!50},
+    lock_closed/.pic={
+        \draw node[very thick,rectangle, draw=Mahogany, fill=Mahogany!50, minimum height=8mm] (#1) {\small \tabcolsep=0mm \renewcommand{\arraystretch}{0.75} \begin{tabular}{l}https\\query\end{tabular}};
+        \draw [line width=1mm, Mahogany] ([xshift=-4mm] #1.north) arc [start angle=180, end angle=0, radius=4mm];
+        },
+    lock_open/.pic={
+        \draw node[very thick,rectangle, draw=LimeGreen, fill=LimeGreen!50, minimum height=8mm] (#1) {\small query};
+        \draw [line width=1mm, LimeGreen] ([xshift=-4mm] #1.north) arc [start angle=0, end angle=180, radius=4mm];
+        },
+    key/.pic={
+    \draw node[very thick, circle, draw=Mahogany,fill=Mahogany!50, inner sep=0.5mm](#1){key};
+    \draw [line width=1mm,Mahogany] (#1.west) -- ++(-2mm,0) -- +(0,-1.5mm) ++ (0,0)-- ++(-2mm,0mm)-- +(0,-1.5mm);
+    }
+    ]
+
+    
+    \node (user) [user]{User};
+    \pic [right of=user,xshift=0.75cm]{lock_closed={Q1}};
+    \draw (user) -- (Q1);
+    \node (isp) [partner,right of=Q1,xshift=1.5cm]{\begin{tabular}{c} Internet service \\ provider \end{tabular}};
+    \draw [arrow1] (Q1) -- (isp);
+    \pic [right of=isp,xshift=1.5cm]{lock_closed={Q2}};
+    
+    \node (ddg) [partner, right of=Q2,xshift=1.2cm]
+        {\includegraphics[width=20mm]{images/duckduckgo_logo.pdf}};
+    %Big daddy amazon with aws
+    \node (aws) [right of=ddg,xshift=1.4cm,yshift=-0.75cm]
+        {\includegraphics[width=20mm]{images/powered-by-aws_logo.png}};
+    \node (amazon)[draw=black!50, fit={(ddg) (aws)}] {};
+    \node (ms) [partner, below of=aws,xshift=3cm,yshift=-0.75cm]
+        {\includegraphics[width=20mm]{images/MicrosoftAds.png}};
+    %ISP giving encrypted query to DDG
+    \draw (isp) -- (Q2);
+    \draw [arrow1] (Q2) -- (ddg);
+    %DDG giving user ID to ad partner MS
+    \draw [arrow1] (ddg) -|node[adclick]
+        {\begin{tabular}{c} ad visit\\ + ID\&IP \end{tabular}}
+        (ms);
+        
+    %NSA stuff
+    \node (nsa) [partner, below of=isp,yshift=-3cm]
+        {\includegraphics[width=20mm]{images/nsa_logo.pdf}};
+    \node (order) [order,right of=nsa,xshift=2cm,yshift=0.75cm]
+        {\begin{tabular}{c} court\\ order \end{tabular}};
+    %NSA giving court orders
+    \draw [draw=Goldenrod] ([yshift=0.75cm,]nsa.east) -- (order);
+    \draw [arrow2] (order) -| ([xshift=-0.5cm] ddg.south);
+    \draw [arrow2] (order) -| ([xshift=-0.5cm] aws.south);
+    \draw [arrow2] (order.east) -- ([yshift=-0.75cm] ms.west);
+    %MS giving user ad info to NSA
+    \draw [arrow1] (ms) |-node[adclick]
+        {\begin{tabular}{c} ad visit\\ + ID\&IP \end{tabular}} ([yshift=-0.75cm,]nsa.east);
+    %Amazon giving info to NSA
+    \draw [arrow1] ([xshift=0.5cm]aws.south)|- ([yshift=-0.25cm] nsa.east);
+    \pic [below of=aws,yshift=-2.5cm,xshift=0.5cm]{lock_open={Q_open2}};
+    %DDG giving key to NSA
+    \pic[below of=ddg, xshift=0.5cm,yshift=-1cm]{key={K1}};
+    \draw ([xshift=0.5cm] ddg.south) -- (K1);
+    \draw [arrow1] (K1) |- ([yshift=0.25cm] nsa.east);
+    %ISP giving encrypted info to NSA
+    \draw [arrow1] (isp.south) -- (nsa.north);
+    \pic [below of=isp,yshift=-1.1cm]{lock_closed={Q3}};
+    %NSA outputting unencrypted info
+    \pic [left of=nsa,xshift=-1.5cm,yshift=0.5cm]{lock_open={Q_open1}};
+    \draw [arrow1] ([yshift=0.5cm]nsa.west) -- (Q_open1);
+    \node(adclick)[adclick, left of=nsa, xshift=-1.5cm, yshift=-0.5cm]
+        {\begin{tabular}{c} ad visit\\ + ID\&IP \end{tabular}};
+    \draw [arrow1] ([yshift=-0.5cm]nsa.west) -- (adclick);
+    
+    
+    
+    \end{tikzpicture}
+    \caption{Different ways in which the US Government could theoretically spy on DuckDuckGo users.}
+    \label{ddg_key_nsa}
+\end{figure}
+
+\end{document}
